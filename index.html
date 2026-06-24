@@ -19,7 +19,6 @@
       <span></span><span></span><span></span>
     </button>
     <nav class="primary-nav">
-      <a href="#today">HEADLINES</a>
       <a href="#economy">ECONOMY</a>
       <a href="#culture">CULTURE</a>
       <a href="#tech">TECH</a>
@@ -82,28 +81,6 @@
   </div>
 </section>
 
-<!-- ============== TODAY'S HEADLINES — 10 CARDS, 1 STORY × 5 OUTLETS EACH ============== -->
-<section class="today-news" id="today">
-  <header class="section-head">
-    <span class="section-label reveal"><span id="todayLabel">TODAY</span>  /  <span data-today-dot>—</span></span>
-    <h2 class="reveal">Today's <span class="italic">Headlines.</span></h2>
-    <p class="reveal">Ten stories, each compared across five outlets. Click any headline to read the original — the page learns what you tend to open.</p>
-  </header>
-
-  <div class="hl-grid reveal" id="headlinesGrid">
-    <div class="hl-loading">Loading…</div>
-  </div>
-
-  <div class="meta-bar reveal">
-    <span>SOURCE: GOOGLE NEWS (JA / JP)</span>
-    <span id="todayClicks">learning: idle</span>
-    <span id="todayProfile">profile: —</span>
-    <span id="todayUpdatedAt">UPDATED: —</span>
-    <button id="editProfile" type="button">Edit profile</button>
-    <button id="resetPrefs" type="button">Reset clicks</button>
-    <button id="resetProfile" type="button">Reset profile</button>
-  </div>
-</section>
 
 <!-- ============== EDITOR'S NOTE ============== -->
 <section class="editors-note">
@@ -126,26 +103,30 @@
   </blockquote>
 </section>
 
-<!-- ============== ECONOMY ============== -->
+<!-- ============== ECONOMY (No.01 - No.03) ============== -->
 <section class="grid-section" id="economy">
   <header class="section-head">
     <div class="section-plate reveal">
-      <span class="po-num">No. 02</span>
+      <span class="po-num">No. 01</span>
       <span class="po-sec">SECTION / ECONOMY</span>
     </div>
     <h2 class="reveal">Yen, prices, <span class="italic">three perspectives.</span></h2>
-    <p class="reveal">Live business headlines from major outlets — the same numbers, different narratives.</p>
+    <p class="reveal">Three live business stories, each compared across five outlets.</p>
   </header>
 
-  <div class="three-col">
-    <article class="col reveal"><span class="num">02</span><span class="src">…</span><h3>Loading…</h3><p>—</p></article>
-    <article class="col reveal"><span class="num">03</span><span class="src">…</span><h3>Loading…</h3><p>—</p></article>
-    <article class="col reveal"><span class="num">04</span><span class="src">…</span><h3>Loading…</h3><p>—</p></article>
+  <div class="hl-grid reveal" id="economyGrid">
+    <div class="hl-loading">Loading…</div>
   </div>
 
   <div class="meta-bar reveal">
-    <span>SOURCE: GOOGLE NEWS / BUSINESS</span>
-    <span>READING TIME: 4 MIN</span>
+    <span>SOURCE: GOOGLE NEWS (JA / JP)</span>
+    <span id="todayClicks">learning: idle</span>
+    <span id="todayProfile">profile: —</span>
+    <span id="todayUpdatedAt">UPDATED: —</span>
+    <span id="todayLabel" hidden>TODAY</span>
+    <button id="editProfile" type="button">Edit profile</button>
+    <button id="resetPrefs" type="button">Reset clicks</button>
+    <button id="resetProfile" type="button">Reset profile</button>
   </div>
 </section>
 
@@ -158,22 +139,25 @@
   </div>
 </section>
 
-<!-- ============== CULTURE / WIDE FEATURE ============== -->
+<!-- ============== CULTURE / WIDE FEATURE (No.04 - No.05) ============== -->
 <section class="wide-feature" id="culture">
   <div class="wf-inner">
-    <span class="section-label reveal">SECTION  /  CULTURE</span>
+    <div class="section-plate reveal">
+      <span class="po-num">No. 04</span>
+      <span class="po-sec">SECTION / CULTURE</span>
+    </div>
     <div class="wf-grid">
       <div class="wf-text">
-        <h2 class="reveal">Culture, <span class="italic">loading…</span></h2>
-        <p class="reveal">Selected culture & entertainment headlines, fetched live.</p>
-        <ul class="wf-list reveal">
-          <li><span>…</span>Loading…</li>
-        </ul>
+        <h2 class="reveal">Culture, <span class="italic">five outlets at a time.</span></h2>
+        <p class="reveal">Two live culture & entertainment stories, each compared across five outlets.</p>
+        <div class="hl-grid reveal wf-hl-grid" id="cultureGrid">
+          <div class="hl-loading">Loading…</div>
+        </div>
       </div>
       <div class="wf-image reveal">
         <div class="placeholder ph-2">
           <span class="ph-overlay">
-            <span class="po-num">No. 05</span>
+            <span class="po-num">No. 04—05</span>
             <span class="po-sec">SECTION / CULTURE</span>
           </span>
         </div>
@@ -183,7 +167,7 @@
   </div>
 </section>
 
-<!-- ============== TECH ============== -->
+<!-- ============== TECH (No.06 - No.08) ============== -->
 <section class="grid-section dark" id="tech">
   <header class="section-head">
     <div class="section-plate reveal">
@@ -191,15 +175,14 @@
       <span class="po-sec">SECTION / TECH</span>
     </div>
     <h2 class="reveal">Tech, at the center <span class="italic">of geopolitics.</span></h2>
+    <p class="reveal">Three live technology stories, each compared across five outlets.</p>
   </header>
-  <div class="three-col">
-    <article class="col reveal"><span class="num">06</span><span class="src">…</span><h3>Loading…</h3><p>—</p></article>
-    <article class="col reveal"><span class="num">07</span><span class="src">…</span><h3>Loading…</h3><p>—</p></article>
-    <article class="col reveal"><span class="num">08</span><span class="src">…</span><h3>Loading…</h3><p>—</p></article>
+  <div class="hl-grid reveal" id="techGrid">
+    <div class="hl-loading">Loading…</div>
   </div>
 </section>
 
-<!-- ============== WORLD ============== -->
+<!-- ============== WORLD (No.09 - No.10) ============== -->
 <section class="world-section" id="world">
   <header class="section-head center">
     <div class="section-plate reveal">
@@ -207,18 +190,11 @@
       <span class="po-sec">SECTION / WORLD</span>
     </div>
     <h2 class="reveal">Same event, <span class="italic">different skies.</span></h2>
+    <p class="reveal">Two live world stories, each compared across five outlets.</p>
   </header>
 
-  <div class="world-list">
-    <article class="world-item reveal">
-      <span class="w-num">09</span>
-      <div class="w-body">
-        <h3>Loading world headlines…</h3>
-        <div class="w-sources">
-          <div><span class="src">…</span><p>—</p></div>
-        </div>
-      </div>
-    </article>
+  <div class="hl-grid reveal" id="worldGrid">
+    <div class="hl-loading">Loading…</div>
   </div>
 </section>
 
@@ -338,7 +314,6 @@
 <!-- ============== MOBILE NAV OVERLAY ============== -->
 <div class="mobile-nav" id="mobileNav">
   <nav>
-    <a href="#today">HEADLINES</a>
     <a href="#economy">ECONOMY</a>
     <a href="#culture">CULTURE</a>
     <a href="#tech">TECH</a>

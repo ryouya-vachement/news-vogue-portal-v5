@@ -994,6 +994,44 @@ button{ cursor:pointer; font-family:inherit; border:none; background:none; color
   .hl-related li{ grid-template-columns: 80px 1fr; gap: 10px; }
 }
 
+/* TECH (dark) section overrides for hl-card */
+.grid-section.dark .hl-card{
+  background: transparent;
+  border-color: var(--accent);
+  color: var(--paper);
+}
+.grid-section.dark .hl-card:hover{
+  box-shadow: 0 14px 28px -16px rgba(255,255,255,.15);
+}
+.grid-section.dark .hl-head{ border-bottom-color: var(--accent); }
+.grid-section.dark .hl-outlet-count{
+  border-color: var(--accent);
+  color: var(--paper);
+}
+.grid-section.dark .hl-related{
+  border-top-color: var(--accent);
+}
+.grid-section.dark .hl-meta,
+.grid-section.dark .hl-rel-label,
+.grid-section.dark .hl-rel-src{
+  color: var(--accent);
+}
+.grid-section.dark .hl-main-src{ color: var(--paper); }
+
+/* CULTURE wide-feature — single-column hl-grid inside the text column */
+.wide-feature .wf-hl-grid{
+  grid-template-columns: 1fr;
+  gap: 22px;
+}
+.wide-feature .section-plate{
+  margin-bottom: 22px;
+}
+
+/* WORLD on paper-2 — keep cards on light paper background */
+.world-section .hl-card{
+  background: var(--paper);
+}
+
 /* ============== TOP STORY — HEADLINE LIST (No.1) ============== */
 .ts-headline-list{
   list-style: none;

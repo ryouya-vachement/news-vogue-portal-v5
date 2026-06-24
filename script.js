@@ -416,6 +416,72 @@
     }
   };
 
+  /* Generic per-section card grid: N cards from `mainFeed`, each shown
+     across up to 5 outlets via Google News' own cluster (+ on-topic
+     padding from the rest of the feed pool when needed). */
+  const renderCardGrid = (gridId, mainFeed, allFeeds, cat, n, startNum) => {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    const mains = (mainFeed || []).slice(0, n);
+    if (!mains.length) {
+      grid.innerHTML = '<div class="hl-loading">No coverage available right now.</div>';
+      return;
+    }
+    const pool = []
+      .concat(allFeeds.top || [], allFeeds.nation || [], allFeeds.world || [],
+              allFeeds.business || [], allFeeds.tech || [], allFeeds.ent || []);
+
+    grid.innerHTML = mains.map((it, i) => {
+      const clustered = (it.related || []).filter(r =>
+        r.source && r.source.trim() && r.source !== it.source
+      );
+      const seen = new Set([it.source, ...clustered.map(r => r.source)]);
+      const usedLinks = new Set([it.link, ...clustered.map(r => r.link)]);
+      let related = clustered.slice();
+      if (related.length < 4) {
+        const titleTokens = new Set(tokenize(it.title));
+        const candidates = pool
+          .filter(p => !usedLinks.has(p.link) && !seen.has(p.source))
+          .map(p => ({ p, overlap: tokenize(p.title).filter(t => titleTokens.has(t)).length }))
+          .filter(x => x.overlap > 0)
+          .sort((a, b) => b.overlap - a.overlap);
+        for (const { p } of candidates) {
+          if (related.length >= 4) break;
+          if (seen.has(p.source)) continue;
+          seen.add(p.source);
+          usedLinks.add(p.link);
+          related.push(p);
+        }
+      }
+      related = related.slice(0, 4);
+
+      const altList = related.map(r => `
+        <li>
+          <span class="hl-rel-src">${sourceLink(r.source)}</span>
+          <a class="hl-rel-link" href="${escapeHtml(r.link)}" target="_blank" rel="noopener noreferrer" data-cat="${escapeHtml(cat)}" data-source="${escapeHtml(r.source)}">${escapeHtml(r.title)}</a>
+        </li>
+      `).join('');
+      const outletCount = 1 + related.length;
+      const num = (startNum + i).toString().padStart(2, '0');
+      return `
+        <article class="hl-card">
+          <header class="hl-head">
+            <span class="hl-num">No. ${num}</span>
+            <span class="hl-outlet-count">${outletCount} outlets</span>
+          </header>
+          <h3 class="hl-title">
+            <a href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer" data-cat="${escapeHtml(cat)}" data-source="${escapeHtml(it.source)}">${escapeHtml(it.title)}</a>
+          </h3>
+          <p class="hl-meta"><span class="hl-main-src">${sourceLink(it.source)}</span><span class="hl-dot">·</span><span class="hl-time">${escapeHtml(timeAgo(it.date))}</span></p>
+          <div class="hl-related">
+            <span class="hl-rel-label">Also covered by</span>
+            <ul>${altList || '<li class="hl-rel-empty">— no related coverage found</li>'}</ul>
+          </div>
+        </article>
+      `;
+    }).join('');
+  };
+
   const renderTopStory = (items) => {
     const ts = document.querySelector('.top-story .ts-text');
     if (!ts || !items.length) return;
@@ -815,17 +881,23 @@
         tech:     rankFeed(rotateByDay(tech),     'tech'),
         ent:      rankFeed(rotateByDay(ent),      'ent'),
       };
-      renderHeadlines10(feeds);
-      renderThreeCol('#economy .three-col', feeds.business, 2, 'business');
-      renderThreeCol('#tech .three-col', feeds.tech, 6, 'tech');
-      renderCulture(feeds.ent);
-      renderWorld(feeds.world);
+      // Distribute the day's 10 stories across 4 category sections
+      //   ECONOMY  : No.01-03 (business)
+      //   CULTURE  : No.04-05 (entertainment)
+      //   TECH     : No.06-08 (technology)
+      //   WORLD    : No.09-10 (world)
+      renderCardGrid('economyGrid', feeds.business, feeds, 'business', 3, 1);
+      renderCardGrid('cultureGrid', feeds.ent,      feeds, 'ent',      2, 4);
+      renderCardGrid('techGrid',    feeds.tech,     feeds, 'tech',     3, 6);
+      renderCardGrid('worldGrid',   feeds.world,    feeds, 'world',    2, 9);
       renderCompare({ nation: feeds.nation, business: feeds.business, tech: feeds.tech, world: feeds.world });
       renderArchive(feeds);
     } catch (err) {
-      const grid = document.getElementById('headlinesGrid');
-      if (grid) grid.innerHTML =
-        `<div class="hl-loading">News failed to load.<small>${escapeHtml(err.message || err)}</small></div>`;
+      ['economyGrid', 'cultureGrid', 'techGrid', 'worldGrid'].forEach(id => {
+        const g = document.getElementById(id);
+        if (g) g.innerHTML =
+          `<div class="hl-loading">News failed to load.<small>${escapeHtml(err.message || err)}</small></div>`;
+      });
     }
   })();
 
