@@ -19,7 +19,7 @@
       <span></span><span></span><span></span>
     </button>
     <nav class="primary-nav">
-      <a href="#politics">POLITICS</a>
+      <a href="#today">HEADLINES</a>
       <a href="#economy">ECONOMY</a>
       <a href="#culture">CULTURE</a>
       <a href="#tech">TECH</a>
@@ -82,17 +82,17 @@
   </div>
 </section>
 
-<!-- ============== TODAY'S HEADLINES (LIVE) ============== -->
+<!-- ============== TODAY'S HEADLINES — 10 CARDS, 1 STORY × 5 OUTLETS EACH ============== -->
 <section class="today-news" id="today">
   <header class="section-head">
     <span class="section-label reveal"><span id="todayLabel">TODAY</span>  /  <span data-today-dot>—</span></span>
     <h2 class="reveal">Today's <span class="italic">Headlines.</span></h2>
-    <p class="reveal">Live headlines from Google News, fetched on page load. Click a story to read the original, and the page learns what you tend to open.</p>
+    <p class="reveal">Ten stories, each compared across five outlets. Click any headline to read the original — the page learns what you tend to open.</p>
   </header>
 
-  <ul class="today-list reveal" id="todayNewsList">
-    <li class="today-loading">Loading…</li>
-  </ul>
+  <div class="hl-grid reveal" id="headlinesGrid">
+    <div class="hl-loading">Loading…</div>
+  </div>
 
   <div class="meta-bar reveal">
     <span>SOURCE: GOOGLE NEWS (JA / JP)</span>
@@ -113,33 +113,6 @@
       Open ten newspapers and the same event wears ten different faces. This page gathers the front-page voices of major papers and wire services — <em>Asahi, Yomiuri, Mainichi, Nikkei, Sankei, Kyodo, Jiji, NHK, Reuters, AP</em> — side by side, so you can draw your own line.
     </p>
     <span class="signature reveal">— The Editors</span>
-  </div>
-</section>
-
-<!-- ============== TOP STORY ============== -->
-<section class="top-story" id="politics">
-  <div class="ts-grid">
-    <div class="ts-image reveal">
-      <div class="placeholder ph-1">
-        <span class="ph-overlay">
-          <span class="po-num">No. 01</span>
-          <span class="po-sec">SECTION / POLITICS</span>
-        </span>
-      </div>
-      <span class="caption">PHOTOGRAPH / EDITORIAL ARCHIVE</span>
-    </div>
-    <div class="ts-text">
-      <span class="kicker reveal">TOP STORY  /  POLITICS</span>
-      <h2 class="reveal">Today's top story is <span class="italic">loading…</span></h2>
-      <p class="lede reveal">Live national headlines, fetched from major outlets on page load.</p>
-
-      <div class="voices reveal">
-        <h3 class="voices-title">TODAY'S HEADLINES</h3>
-        <ul class="ts-headline-list">
-          <li class="ts-line"><span class="ts-num">—</span><span class="ts-source">…</span><a class="ts-headline-link">Loading…</a><span class="ts-time">—</span></li>
-        </ul>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -365,7 +338,7 @@
 <!-- ============== MOBILE NAV OVERLAY ============== -->
 <div class="mobile-nav" id="mobileNav">
   <nav>
-    <a href="#politics">POLITICS</a>
+    <a href="#today">HEADLINES</a>
     <a href="#economy">ECONOMY</a>
     <a href="#culture">CULTURE</a>
     <a href="#tech">TECH</a>

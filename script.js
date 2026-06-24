@@ -229,6 +229,32 @@
     ent:      `${RSS_BASE}/headlines/section/topic/ENTERTAINMENT?hl=ja&gl=JP&ceid=JP:ja`,
   };
 
+  /* Parse related coverage from Google News RSS description HTML.
+     A typical description is an <ol>/<table> of <a> links of the form
+     "Title - Source", grouped by Google News' own clustering. */
+  const parseRelated = (descHtml, mainLink) => {
+    if (!descHtml) return [];
+    const out = [];
+    const seen = new Set();
+    const re = /<a [^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/g;
+    let m;
+    while ((m = re.exec(descHtml)) !== null) {
+      const link = m[1];
+      if (link === mainLink) continue;
+      if (seen.has(link)) continue;
+      seen.add(link);
+      const raw = m[2].replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"').trim();
+      const mm = raw.match(/^(.+)\s+-\s+([^-]+)$/);
+      out.push({
+        title: (mm ? mm[1] : raw).trim(),
+        source: (mm ? mm[2] : 'NEWS').trim(),
+        link,
+        date: null,
+      });
+    }
+    return out;
+  };
+
   const parseItem = (item) => {
     const raw = item.title || '';
     const m = raw.match(/^(.+)\s+-\s+([^-]+)$/);
@@ -236,7 +262,8 @@
     const source = ((m ? m[2] : (item.author || 'NEWS'))).trim();
     const link = item.link || '#';
     const date = item.pubDate ? new Date(item.pubDate) : null;
-    return { title, source, link, date };
+    const related = parseRelated(item.description || item.content || '', link);
+    return { title, source, link, date, related };
   };
 
   const fetchFeed = async (url) => {
@@ -298,12 +325,13 @@
      RENDERERS
      ============================================================ */
 
-  const renderToday = (feeds) => {
-    const list = document.getElementById('todayNewsList');
+  /* No.1-10 cards: each card = 1 story shown across 5 outlets */
+  const renderHeadlines10 = (feeds) => {
+    const grid = document.getElementById('headlinesGrid');
     const updated = document.getElementById('todayUpdatedAt');
     const label = document.getElementById('todayLabel');
     const clicksLabel = document.getElementById('todayClicks');
-    if (!list) return;
+    if (!grid) return;
 
     const prefs = loadPrefs();
     const profile = loadProfile() || {};
@@ -312,50 +340,76 @@
       (profile.interests?.length > 0) ||
       (profile.keywords?.length > 0);
 
-    const weights = getCatWeights();
-    const slots = distributeSlots(weights, 8);
-
-    // Pick from each category's ranked feed
-    let picked = [];
-    CATS.forEach(c => {
-      const n = slots[c] || 0;
-      const arr = (feeds[c] || []).slice(0, n).map(it => ({ ...it, _cat: c }));
-      picked = picked.concat(arr);
-    });
-    if (!picked.length && feeds.top && feeds.top.length) {
-      picked = feeds.top.slice(0, 8).map(it => ({ ...it, _cat: 'nation' }));
+    // Take 10 main stories from top feed (already ranked + day-rotated).
+    const mains = (feeds.top || []).slice(0, 10);
+    if (!mains.length) {
+      grid.innerHTML = '<div class="hl-loading">Could not load today\'s news.</div>';
+      return;
     }
-    // Final sort by score so the top of the list is the strongest match
-    picked.sort((a, b) =>
-      scoreItem(b, { prefs, profile, catOfFeed: b._cat }) -
-      scoreItem(a, { prefs, profile, catOfFeed: a._cat })
-    );
-    picked = picked.slice(0, 8);
 
     if (label) label.textContent = personalized ? 'FOR YOU' : 'TODAY';
     if (clicksLabel) clicksLabel.textContent = personalized
       ? `learning: ${prefs.total || 0} clicks`
       : 'learning: idle';
 
-    if (!picked.length) {
-      list.innerHTML = '<li class="today-loading">Could not load today\'s news.</li>';
-      return;
-    }
-    list.innerHTML = picked.map((it, i) => {
-      const t = it.date
-        ? `${String(it.date.getHours()).padStart(2, '0')}:${String(it.date.getMinutes()).padStart(2, '0')}`
-        : '';
-      return `
-        <li class="today-item">
-          <span class="t-num">${String(i + 1).padStart(2, '0')}</span>
-          <div class="t-body">
-            <span class="t-source">${sourceLink(it.source)}</span>
-            <a class="t-headline" href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer" data-cat="${escapeHtml(it._cat)}" data-source="${escapeHtml(it.source)}">${escapeHtml(it.title)}</a>
-          </div>
-          <span class="t-time">${t}</span>
+    // Build a pool of all available items (for related-padding when
+    // Google News' own cluster has fewer than 4 outlets).
+    const pool = []
+      .concat(feeds.top || [], feeds.nation || [], feeds.world || [],
+              feeds.business || [], feeds.tech || [], feeds.ent || []);
+
+    grid.innerHTML = mains.map((it, i) => {
+      // Google News-clustered related coverage (different outlets)
+      const clustered = (it.related || []).filter(r =>
+        r.source && r.source.trim() && r.source !== it.source
+      );
+      const seen = new Set([it.source, ...clustered.map(r => r.source)]);
+      const usedLinks = new Set([it.link, ...clustered.map(r => r.link)]);
+
+      let related = clustered.slice();
+      // Pad until we have 4 distinct alternate outlets
+      if (related.length < 4) {
+        const titleTokens = new Set(tokenize(it.title));
+        const candidates = pool
+          .filter(p => !usedLinks.has(p.link) && !seen.has(p.source))
+          .map(p => ({ p, overlap: tokenize(p.title).filter(t => titleTokens.has(t)).length }))
+          .filter(x => x.overlap > 0)
+          .sort((a, b) => b.overlap - a.overlap);
+        for (const { p } of candidates) {
+          if (related.length >= 4) break;
+          if (seen.has(p.source)) continue;
+          seen.add(p.source);
+          usedLinks.add(p.link);
+          related.push(p);
+        }
+      }
+      related = related.slice(0, 4);
+
+      const altList = related.map(r => `
+        <li>
+          <span class="hl-rel-src">${sourceLink(r.source)}</span>
+          <a class="hl-rel-link" href="${escapeHtml(r.link)}" target="_blank" rel="noopener noreferrer" data-cat="nation" data-source="${escapeHtml(r.source)}">${escapeHtml(r.title)}</a>
         </li>
+      `).join('');
+      const outletCount = 1 + related.length;
+      return `
+        <article class="hl-card">
+          <header class="hl-head">
+            <span class="hl-num">No. ${String(i + 1).padStart(2, '0')}</span>
+            <span class="hl-outlet-count">${outletCount} outlets</span>
+          </header>
+          <h3 class="hl-title">
+            <a href="${escapeHtml(it.link)}" target="_blank" rel="noopener noreferrer" data-cat="nation" data-source="${escapeHtml(it.source)}">${escapeHtml(it.title)}</a>
+          </h3>
+          <p class="hl-meta"><span class="hl-main-src">${sourceLink(it.source)}</span><span class="hl-dot">·</span><span class="hl-time">${escapeHtml(timeAgo(it.date))}</span></p>
+          <div class="hl-related">
+            <span class="hl-rel-label">Also covered by</span>
+            <ul>${altList || '<li class="hl-rel-empty">— no related coverage found</li>'}</ul>
+          </div>
+        </article>
       `;
     }).join('');
+
     if (updated) {
       const now = new Date();
       updated.textContent = `UPDATED: ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -761,8 +815,7 @@
         tech:     rankFeed(rotateByDay(tech),     'tech'),
         ent:      rankFeed(rotateByDay(ent),      'ent'),
       };
-      renderToday(feeds);
-      renderTopStory(feeds.nation);
+      renderHeadlines10(feeds);
       renderThreeCol('#economy .three-col', feeds.business, 2, 'business');
       renderThreeCol('#tech .three-col', feeds.tech, 6, 'tech');
       renderCulture(feeds.ent);
@@ -770,9 +823,9 @@
       renderCompare({ nation: feeds.nation, business: feeds.business, tech: feeds.tech, world: feeds.world });
       renderArchive(feeds);
     } catch (err) {
-      const list = document.getElementById('todayNewsList');
-      if (list) list.innerHTML =
-        `<li class="today-loading">News failed to load.<small>${escapeHtml(err.message || err)}</small></li>`;
+      const grid = document.getElementById('headlinesGrid');
+      if (grid) grid.innerHTML =
+        `<div class="hl-loading">News failed to load.<small>${escapeHtml(err.message || err)}</small></div>`;
     }
   })();
 

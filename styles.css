@@ -869,6 +869,131 @@ button{ cursor:pointer; font-family:inherit; border:none; background:none; color
   .sub-form button{ padding: 14px 22px; }
 }
 
+/* ============== HEADLINES GRID — 10 cards, 1 story × 5 outlets ============== */
+.hl-grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 28px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.hl-card{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px 26px;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+.hl-card:hover{ transform: translateY(-3px); box-shadow: 0 14px 28px -16px rgba(10,10,10,.35); }
+.hl-head{
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ink);
+}
+.hl-num{
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: 24px;
+  letter-spacing: .12em;
+}
+.hl-outlet-count{
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: .25em;
+  padding: 4px 10px;
+  border: 1px solid var(--ink);
+}
+.hl-title{
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(20px, 1.6vw, 26px);
+  line-height: 1.28;
+  letter-spacing: -0.005em;
+}
+.hl-title a{
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size .35s ease;
+  padding-bottom: 2px;
+}
+.hl-title a:hover{ background-size: 100% 1px; }
+.hl-meta{
+  display: flex; gap: 8px; align-items: center;
+  font-size: 11px; letter-spacing: .2em;
+  color: var(--mid);
+}
+.hl-main-src{ font-weight: 700; color: var(--ink); }
+.hl-dot{ opacity: .5; }
+.hl-related{
+  margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px dashed #b8b4a8;
+}
+.hl-rel-label{
+  display: block;
+  font-size: 10px; letter-spacing: .3em;
+  color: var(--mid);
+  margin-bottom: 12px;
+}
+.hl-related ul{
+  list-style: none;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.hl-related li{
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.hl-rel-src{
+  font-size: 10px; letter-spacing: .22em;
+  color: var(--mid);
+  text-transform: none;
+}
+.hl-rel-link{
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size .35s ease;
+  padding-bottom: 1px;
+}
+.hl-rel-link:hover{ background-size: 100% 1px; }
+.hl-rel-empty{
+  grid-column: 1 / -1;
+  color: var(--mid);
+  font-style: italic;
+}
+.hl-loading{
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 0;
+  font-family: var(--serif-2);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--mid);
+}
+.hl-loading small{
+  display: block;
+  font-family: var(--sans);
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: .2em;
+  margin-top: 8px;
+}
+@media (max-width: 720px){
+  .hl-grid{ grid-template-columns: 1fr; gap: 20px; }
+  .hl-card{ padding: 22px 18px; }
+  .hl-related li{ grid-template-columns: 80px 1fr; gap: 10px; }
+}
+
 /* ============== TOP STORY — HEADLINE LIST (No.1) ============== */
 .ts-headline-list{
   list-style: none;
